@@ -1,6 +1,7 @@
 // https://eslint.org/docs/user-guide/configuring
 
 module.exports = {
+    root: true,
     parserOptions: {
         "ecmaVersion": 2016,
         "sourceType": "module"
@@ -35,7 +36,8 @@ module.exports = {
         "camelcase":0,
         "quotes":0,
         "prefer-const":0,
-
+        "no-catch-shadow":0,
+        "no-delete-var": 0,
         // 警告
         "no-extra-boolean-cast": 1, // 不必要的bool转换
         "no-extra-parens": 1, // 非必要的括号

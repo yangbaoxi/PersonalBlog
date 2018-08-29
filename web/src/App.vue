@@ -9,3 +9,6 @@
         name: 'App'
     }
 </script>
+<style>
+    @import url("./assets/icon/iconfont.css");
+</style>
