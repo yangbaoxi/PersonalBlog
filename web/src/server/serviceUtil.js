@@ -3,14 +3,14 @@ import axios from 'axios'
 import { Message } from "element-ui"  // 弹框组件
 let cancel, promiseArr = {};
 const CancelToken = axios.CancelToken;
-//axios.defaults.baseURL = BM_config.api;
+axios.defaults.baseURL = PersonalBlog.api;
 //设置默认请求头
-//axios.defaults.headers = {
-    // 'X-Requested-With': 'XMLHttpRequest',
-    // "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-    //  'Content-Type':'application/json;charset=UTF-8',
-    //'Content-Type': BM_config.headerContent
-//}
+axios.defaults.headers = {
+    //'X-Requested-With': 'XMLHttpRequest',
+    //"Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+    //'Content-Type':'application/json;charset=UTF-8',
+    'Content-Type': PersonalBlog.headerContent
+}
 // axios.defaults.timeout = BM_config.timeout;
 //请求拦截器
 axios.interceptors.request.use(config => {

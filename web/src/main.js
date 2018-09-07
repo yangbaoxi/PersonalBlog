@@ -9,14 +9,14 @@ import router from './router'
 // store 是 vuex 全局状态管理 使用: this.$store.xxx
 import { store } from './store/index'
 // api 接口  使用 ： this.$api.xxx
-// import $api from './server/server.js'
+import $api from './server/server.js'
 // 全局公共函数
-// import $Fn from './utils/public'
+import $Fn from './utils/public'
 // 全局公共变量
 // import $publicData from "./utils/data"
 
-// Vue.prototype.$api = $api;
-// Vue.prototype.$Fn = $Fn;
+Vue.prototype.$api = $api;
+Vue.prototype.$Fn = $Fn;
 // Vue.prototype.$publicData = $publicData;
 Vue.use(ElementUI);
 Vue.config.productionTip = false

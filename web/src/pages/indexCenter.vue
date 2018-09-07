@@ -6,44 +6,36 @@
         <div class="main clearfix" :style="{height: winHeight + 'px'}">
             <div class="menu fl">
                 <el-menu
-                    default-active="2"
+                    default-active="$0"
                     class="el-menu-vertical-demo"
                     @open="handleOpen"
                     @close="handleClose"
                     background-color="#f9f9f9"
                     text-color="#333333"
                     active-text-color="#1b62ab">
-                    <el-submenu index="1">
+                    <el-submenu index="$0">
                         <template slot="title">
                             <i class="el-icon-location"></i>
-                            <span>导航一</span>
+                            <span>公共资料</span>
                         </template>
-                        <el-menu-item-group>
-                            <template slot="title">分组一</template>
-                            <el-menu-item index="1-1">选项1</el-menu-item>
-                            <el-menu-item index="1-2">选项2</el-menu-item>
-                        </el-menu-item-group>
-                        <el-menu-item-group title="分组2">
-                            <el-menu-item index="1-3">选项3</el-menu-item>
-                        </el-menu-item-group>
-                        <el-submenu index="1-4">
-                            <template slot="title">选项4</template>
-                            <el-menu-item index="1-4-1">选项1</el-menu-item>
-                        </el-submenu>
+                        <el-menu-item v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">{{ item.handLine }}</el-menu-item>
                     </el-submenu>
-                    <el-menu-item index="2">
-                        <i class="el-icon-menu"></i>
-                        <span slot="title">导航二</span>
-                    </el-menu-item>
-                    <el-menu-item index="3" disabled>
-                        <i class="el-icon-document"></i>
-                        <span slot="title">导航三</span>
-                    </el-menu-item>
-                    <el-menu-item index="4">
-                        <i class="el-icon-setting"></i>
-                        <span slot="title">导航四</span>
-                    </el-menu-item>
+                    <el-submenu index="$1">
+                        <template slot="title">
+                            <i class="el-icon-location"></i>
+                            <span>私有资料</span>
+                        </template>
+                        <el-menu-item v-for="(item, index) in menuPrivateData" :key="index" :index="item.menuIndex">{{ item.handLine }}</el-menu-item>
+                    </el-submenu>
                 </el-menu>
+            </div>
+            <div class="content fl clearfix">
+                <div class="text fl">
+
+                </div>
+                <div class="code fl">
+
+                </div>
             </div>
         </div>
     </div>
@@ -53,7 +45,10 @@
 export default {
     data () {
         return {
-            winHeight: ""
+            storage: null,
+            winHeight: "",
+            menuCommonData: [],
+            menuPrivateData: []
         }
     },
     methods: {
@@ -62,14 +57,44 @@ export default {
         },
         handleClose(){
 
+        },
+        // 获取公共数据
+        getMenuCommon(){
+            this.$api.getMenuCommon().then((res) => {
+                this.$Fn.errorCode(res.code, res.message).then(() => {
+                    console.log('私有数据,',res);
+                    this.menuCommonData = res.data;
+                    this.menuCommonData.forEach(item => {
+                        item.menuIndex = item.nodeId.toString();
+                    })
+                })
+            })
+        },
+        // 获取私有数据
+        getMenuPrivate(){
+            let userId = this.storage.get('userId');
+            this.$api.getMenuPrivate(userId).then((res) => {
+                this.$Fn.errorCode(res.code, res.message).then(() => {
+                    console.log(res.data);
+                    this.menuPrivateData = res.data;
+                    this.menuPrivateData.forEach(item => {
+                        item.menuIndex = item.nodeId.toString();
+                    });
+                })
+            }).catch((err) => {
+                console.log(err);
+            })
         }
     },
     mounted () {
+        this.storage = new this.$Fn.Localstorage();
         this.winHeight = document.body.clientHeight;
-        console.log(this.winHeight);
         window.onresize = () => {
             this.winHeight = document.body.clientHeight;
         }
+        // 获取菜单数据
+        this.getMenuCommon();
+        this.getMenuPrivate();
     }
 }
 </script>
@@ -97,6 +122,19 @@ export default {
     }
     .index-center .menu::-webkit-scrollbar-track{
         border-radius: 10px;
+    }
+    .index-center .content{
+        width: calc(100% - 220px);
+        height: 100%;
+    }
+    .index-center .content .text{
+        width: 50%;
+        height: 100%;
+    }
+    .index-center .content .code{
+        width: 50%;
+        height: 100%;
+        background: #1b62ab;
     }
 </style>
 <style>

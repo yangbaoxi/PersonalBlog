@@ -9,10 +9,10 @@
                 <h3>用户登录</h3>
             </div>
             <div class="input">
-                <el-input v-model="input" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="用户名"></el-input>
-                <el-input v-model="input" prefix-icon="el-icon-ump-pwd" placeholder="密码"></el-input>
+                <el-input v-model="reqUser.userName" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="用户名"></el-input>
+                <el-input v-model="reqUser.password" type="password" prefix-icon="el-icon-ump-pwd" placeholder="密码"></el-input>
                 <div class="createCode">
-                    <el-input v-model="input" prefix-icon="el-icon-ump-key" placeholder="验证码"></el-input>
+                    <el-input v-model="userCode" prefix-icon="el-icon-ump-key" placeholder="验证码"></el-input>
                     <span class="code" @click="switchCode()">
                         {{ loginCode }}
                     </span>
@@ -27,8 +27,9 @@
 export default {
     data () {
         return {
-            winHeight: "",
-            slideshowImages: [
+            storage: null,
+            winHeight: "",              // 浏览器main高度
+            slideshowImages: [          // 登录页
                 {
                     src: require('../assets/images/1.jpg')
                 },
@@ -42,8 +43,12 @@ export default {
                     src: require('../assets/images/4.jpg')
                 }
             ],
-            input: "",
-            loginCode: ""
+            loginCode: "",
+            userCode: "",
+            reqUser: {
+                userName: "",
+                password: ""
+            }
         }
     },
     methods: {
@@ -53,20 +58,57 @@ export default {
             let random = [0,1,2,3,4,5,6,7,8,9,'A','a','B','b','C','c','D','d','E','e','F','f','G','g','H','h','I','i','J','j','K','k','L','l','M','m','N','n','O','o','P','p','Q','q','R','r','S','s','T','t','U','u','V','v','W','w','X','x','Y','y','Z','z'];
             for (let i = 0; i < codeLength; i++){
                 let index = Math.floor(Math.random() * 62);
-                console.log(index);
+                // console.log(index);
                 this.loginCode += random[index];
-                console.log(random[index]);
-                console.log(this.loginCode);
+                // console.log(random[index]);
+                // console.log(this.loginCode);
             }
         },
         switchCode(){
             this.createCode();
         },
         signIn(){
-            this.$router.push('/indexCenter');
+            let userCode = this.userCode.toUpperCase();
+            let loginCode = this.loginCode.toUpperCase();
+            // console.log('输入',userCode);
+            // console.log('效验码',loginCode);
+            if (this.reqUser.userName.length == 0 || this.reqUser.password.length == 0 || userCode != loginCode){
+                if (this.reqUser.userName.length == 0){
+                    this.$message({
+                        message: '请输入用户名',
+                        type: 'warning'
+                    });
+                } else if (this.reqUser.password.length == 0){
+                    this.$message({
+                        message: '请输入密码',
+                        type: 'warning'
+                    });
+                } else if (userCode != loginCode){
+                    this.$message({
+                        message: '效验码不正确',
+                        type: 'warning'
+                    });
+                    this.createCode();
+                }
+            } else {
+                this.$api.signIn(this.reqUser)
+                .then((res) => {
+                    this.$Fn.errorCode(res.code,res.message)
+                    .then(() => {
+                        console.log(res);
+                        this.storage.set('userId',res.userId);
+                        this.$router.push('/indexCenter');
+                    })
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+            }
         }
     },
     mounted () {
+        // Localstorage
+        this.storage = new this.$Fn.Localstorage();
         this.winHeight = document.body.clientHeight;
         window.onresize = () => {
             this.winHeight = document.body.clientHeight;
