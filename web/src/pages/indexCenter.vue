@@ -93,7 +93,7 @@ export default {
             this.winHeight = document.body.clientHeight;
         }
         // 获取菜单数据
-        this.getMenuCommon();
+        // this.getMenuCommon();
         this.getMenuPrivate();
     }
 }

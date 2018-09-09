@@ -16,8 +16,18 @@ const getMenuCommon = data => {
 const getMenuPrivate = data => {
     return req.get('/menu/private/' + data)
 }
+// 测试post接口
+const ceshiPost = (paths, data) => {
+    return req.post(paths, data);
+}
+// 测试get 接口
+const ceshiGet = (paths, data) => {
+    return req.get(paths + data);
+}
 export default{
     signIn,
     getMenuPrivate,
-    getMenuCommon
+    getMenuCommon,
+    ceshiPost,
+    ceshiGet
 }

@@ -3,10 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors');
+// var cookieSession = require('cookie-session');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var menuCommonRouter = require('./routes/menuCommon');
+var moduleRouter = require('./routes/module');
 
 var app = express();
 
@@ -14,6 +17,11 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// app.use(cors({
+//     origin: "http://localhost:8080",
+//     credentials: true,
+//     maxAge: '1728000'
+// }))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -22,23 +30,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 跨域
 app.all('*',(req, res, next)=>{
-    // Access-Control-Allow-origin
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-    // res.header("Access-Control-Allow-Headers", "X-Requested-With");
+//     // Access-Control-Allow-origin
+//     // res.header("Access-Control-Allow-Origin", "*");
+//     // res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild, Set-Cookie');
+//     // res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+//     // res.header("X-Powered-By",'Express');
+//     // res.header("Content-Type", "application/json;charset=utf-8");
+//     // if (req.method == "OPTIONS"){
+//     //     res.send(200); // 让options请求快速返回
+//     // } else {
+//     //     next();
+//     // }
+//     // =============
+    res.header("Access-Control-Allow-Origin", req.headers.origin); //需要显示设置来源
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-    res.header("X-Powered-By",' 3.2.1')
+    res.header("Access-Control-Allow-Credentials",true); //带cookies7  
+    res.header("X-Powered-By",' 3.2.1');   
     res.header("Content-Type", "application/json;charset=utf-8");
-    if (req.method == "OPTIONS"){
-        res.send(200); // 让options请求快速返回
-    } else {
-        next();
-    }
+    next();
 })
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/menu',menuCommonRouter);
+app.use('/details',moduleRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     next(createError(404));

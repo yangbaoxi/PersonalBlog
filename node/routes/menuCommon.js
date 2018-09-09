@@ -8,41 +8,30 @@ router.get('/private/:userId', (req, res, next)=>{
     let ownerId = req.params.userId;
     console.log('用户名',ownerId);
     db.DBConnection.query(`select * from menu where ownerId='${ownerId}'`,(err, data)=>{
-        if (err){
-            console.log(err);
+        if (err) {
             res.status(500).send({
                 code: "0001",
-                message: "链接数据库失败"  
+                message: err
             }).end();
-            return;
+            throw err;
         }
-        let $data = data;
-        function getArticle(arr){
-            return new Promise((resolve, reject)=>{
-                arr.forEach(item => {
-                    db.DBConnection.query(`select * from article where nodeId='${item.nodeId}'`, (err, data)=>{
-                        if (err){
-                            console.log(err);
-                            return;
-                        }
-                        item.children = data;
-                    })
-                });
-                resolve(arr);
+        console.log(data);
+        async.map(data,(item, callback)=>{
+            item.children = [];
+            db.DBConnection.query(`select * from article where nodeId='${item.nodeId}'`,(err, data)=>{
+                if (err) throw err;
+                item.children = data;
+                callback(null, item);
             })
-        }
-
-        getArticle($data).then((data)=>{
-            console.log('异常处理',data);
+        },(err, results)=>{
+            if (err) throw err;
+            console.log('最终的数据shi',results);
+            res.send({
+                code: '0000',
+                message: "success",
+                data: results
+            }).end();
         })
-        console.log('最后数据',$data);
-        
-        res.send({
-            code: "0000",
-            message: "success",
-            data: $data
-        })
-        res.end();
     })
 })
 //  请求公共数据

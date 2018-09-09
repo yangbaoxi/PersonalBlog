@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 
 import loginAccount from "@/pages/loginAccount"
 import indexCenter from "@/pages/indexCenter"
+import ceshi from "@/pages/ceshi"
 Vue.use(Router)
 
 export default new Router({
@@ -18,6 +19,10 @@ export default new Router({
             path: '/indexCenter',
             name: 'indexCenter',
             component: indexCenter
+        },
+        {
+            path: "/ceshi",
+            component: ceshi
         }
     ]
 })

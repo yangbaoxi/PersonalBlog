@@ -4,6 +4,8 @@ import { Message } from "element-ui"  // 弹框组件
 let cancel, promiseArr = {};
 const CancelToken = axios.CancelToken;
 axios.defaults.baseURL = PersonalBlog.api;
+axios.defaults.withCredentials = true;
+console.log('配置',axios.defaults);
 //设置默认请求头
 axios.defaults.headers = {
     //'X-Requested-With': 'XMLHttpRequest',
@@ -117,6 +119,7 @@ export default {
                 method: 'post',
                 url,
                 data: param,
+                // withCredentials: true,
                 cancelToken: new CancelToken(c => {
                     cancel = c
                 })
