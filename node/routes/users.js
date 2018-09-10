@@ -4,17 +4,16 @@ var crypto = require('crypto');
 var db = require('../public/db/personaolDB');
 var common = require('../public/common/common');
 /* GET users listing. */
-router.post('/', function(req, res, next) {
+router.post('/signIn', function(req, res) {
     let userName = req.body.userName;
     let password = crypto.createHmac('sha1','personalBlog!@#').update(req.body.password).digest('hex');
     db.DBConnection.query(`select * from user where userName='${userName}'`,(err, data) => {
         try {
             if (err) throw err;
         } catch (err){
-            console.log(err);
             res.send({
                 code: "0001",
-                message: "链接数据库失败"  
+                message: "系统出现问题！正在抢修中..."  
             }).end();
             return;
         }
@@ -33,7 +32,10 @@ router.post('/', function(req, res, next) {
                     try {
                         if (err) throw err;
                     } catch(err) {
-                        console.log(err);
+                        res.send({
+                            code: "0001",
+                            message: "系统出现问题！正在抢修中..."  
+                        }).end();
                         return; 
                     }
                     res.cookie('token',dateTime,{maxAge: 900000});
@@ -41,7 +43,9 @@ router.post('/', function(req, res, next) {
                     res.send({
                         code: "0000",
                         message: "success",
-                        data: userName
+                        data: {
+                            userName: userName
+                        }
                     }).end();
                 })
             } else {
@@ -53,27 +57,42 @@ router.post('/', function(req, res, next) {
         }
     })
 });
-router.post('/register',(req, res, next)=>{
+router.post('/register',(req, res)=>{
     let userName = req.body.userName;
     let password = crypto.createHmac('sha1','personalBlog!@#').update(req.body.password).digest('hex');
     let realName = req.body.realName;
     let admin = req.body.admin;
     db.DBConnection.query(`select userName from user where userName='${userName}'`, (err, data)=>{
-        console.log(data);
-        if (err) throw err;
+        try {
+            if (err) throw err;
+        } catch(err) {
+            res.send({
+                code: "0001",
+                message: "系统出现问题！正在抢修中..."  
+            }).end();
+            return; 
+        }
         if (data.length == 0){
             db.DBConnection.query(`insert into user(userName,password,realName,admin) values('${userName}','${password}','${realName}','${admin}')`, (err, data)=>{
-                if (err) throw err;
+                try {
+                    if (err) throw err;
+                } catch(err) {
+                    res.send({
+                        code: "0001",
+                        message: "系统出现问题！正在抢修中..."  
+                    }).end();
+                    return; 
+                }
                 res.send({
                     code: "0000",
                     message: "success"
-                })
+                }).end();
             })
         } else {
             res.send({
                 code: "0004",
                 message: "用户名已经存在"
-            })
+            }).end();
         }
     })
     
@@ -95,7 +114,7 @@ router.post('/modify',(req, res) =>{
             res.send({
                 code: "0002",
                 message: "用户名不存在"
-            })
+            }).end();
         } else {  
             let str = common.updateKey(req.body);
             let userId = data[0].id;
