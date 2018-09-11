@@ -30,18 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 跨域
 app.all('*',(req, res, next)=>{
-//     // Access-Control-Allow-origin
-//     // res.header("Access-Control-Allow-Origin", "*");
-//     // res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild, Set-Cookie');
-//     // res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-//     // res.header("X-Powered-By",'Express');
-//     // res.header("Content-Type", "application/json;charset=utf-8");
-//     // if (req.method == "OPTIONS"){
-//     //     res.send(200); // 让options请求快速返回
-//     // } else {
-//     //     next();
-//     // }
-//     // =============
     res.header("Access-Control-Allow-Origin", req.headers.origin); //需要显示设置来源
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");

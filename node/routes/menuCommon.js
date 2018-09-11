@@ -4,7 +4,7 @@ var async = require('async');
 var db = require('../public/db/personaolDB');
 var selectData = require('../public/javascripts/dbSelect');
 //  请求私有数据
-router.get('/private/:userName', (req, res)=>{
+router.get('/private/:userName', (req, res) => {
     let userName = req.params.userName;
     selectData.userInfo(userName, 'id').then((ownerId) => {
         db.DBConnection.query(`select nodeId,handLine from menu where ownerId='${ownerId}'`,(err, data) => {
@@ -52,8 +52,8 @@ router.get('/private/:userName', (req, res)=>{
     })
 })
 //  请求公共数据
-router.get('/common', (req, res)=>{
-    db.DBConnection.query(`select nodeId,handLine from menu where ownerId='0'`,(err, data)=>{
+router.get('/common', (req, res) => {
+    db.DBConnection.query(`select nodeId,handLine from menu where ownerId='0'`,(err, data) => {
         try {
             if (err) throw err; 
         } catch (err){
@@ -73,4 +73,191 @@ router.get('/common', (req, res)=>{
         console.log('数据是：',data);
     })
 })
+// 添加私有数据
+router.post('/setPrivate', (req, res) => {
+    let userName = req.body.userName;
+    let handLine = req.body.handLine;
+    selectData.userInfo(userName,'id').then((ownerId) => {
+        console.log('用户id',ownerId);
+        db.DBConnection.query(`insert into menu(handLine,ownerId) values('${handLine}','${ownerId}')`, (err, data) => {
+            try {
+                if (err) throw err; 
+            } catch (err) {
+                res.send({
+                    code: "0001",
+                    message: err
+                }).end();
+                return;
+            }
+            res.send({
+                code: "0000",
+                message: "success"
+            }).end();
+        })
+    }).catch((err) => {
+        res.send({
+            code: "0001",
+            message: "系统出现问题！正在抢修中..."  
+        }).end();
+    })
+})
+// 添加公共数据
+router.post('/setCommon', (req, res) => {
+    let userName = req.body.userName;
+    let handLine = req.body.handLine;
+    selectData.userInfo(userName,'admin').then((admin) => {
+        console.log('用户权限',admin);
+        
+        if (admin == 1 || admin == 2){
+            let ownerId = 0;
+            db.DBConnection.query(`insert into menu(handLine,ownerId) values('${handLine}','${ownerId}')`, (err, data) => {
+                try {
+                    if (err) throw err; 
+                } catch (err) {
+                    res.send({
+                        code: "0001",
+                        message: err
+                    }).end();
+                    return;
+                }
+                console.log(data);
+            })
+        } else {
+            res.send({
+                code: "0005",
+                message: "对不起，您的权限不够无法创建！"
+            }).end();
+        }
+    }).catch((err)=>{
+        res.send({
+            code: "0001",
+            message: err
+        }).end();
+    })
+})
+// 删除私有数据
+router.post('/deletePrivate', (req, res) => {
+    let nodeId = req.body.nodeId;
+    selectData.articleInfo(nodeId).then((data) => {
+        if (data.length == 0){
+            db.DBConnection.query(`delete from menu where nodeId='${nodeId}'`, (err, data) => {
+                try {
+                    if (err) throw err;
+                } catch (err) {
+                    res.send({
+                        code: "0001",
+                        message: err  
+                    }).end();
+                    return;
+                }
+                res.send({
+                    code: "0000",
+                    message: "success"
+                }).end();
+            })
+        } else {
+            res.send({
+                code: "0006",
+                message: "对不起，此目录下有文章，不能删除！"
+            }).end();
+        }
+    }).catch ((err) => {
+        res.send({
+            code: "0001",
+            message: err  
+        }).end();
+    })
+    
+})
+// 删除公共数据
+router.post('/deleteCommon', (req, res) => {
+    let userName = req.body.userName;
+    let nodeId = req.body.nodeId;
+    selectData.userInfo(userName,'admin').then((admin) => {
+        console.log('用户名管理',admin);
+        if (admin == 1 || admin == 2){
+            db.DBConnection.query(`delete from menu where nodeId='${nodeId}'`, (err, data) => {
+                try {
+                    if (err) throw err;
+                } catch(err){
+                    res.send({
+                        code: "0001",
+                        message: err  
+                    }).end();
+                    return;
+                }
+                res.send({
+                    code: "0000",
+                    message: "success"
+                }).end();
+            })
+        } else {
+            res.send({
+                code: "0005",
+                message: "对不起，您的权限不够无法删除！"
+            }).end();
+        }
+    }).catch((err)=>{
+        res.send({
+            code: "0001",
+            message: err
+        }).end();
+    })
+})
+// 修改私有数据
+router.post('/modifyPrivate', (req, res) => {
+    let nodeId = req.body.nodeId;
+    let handLine = req.body.handLine;
+    db.DBConnection.query(`update menu set handLine='${handLine}' where nodeId='${nodeId}'`, (err, data) => {
+        try {
+            if (err) throw err;
+        } catch(err){
+            res.send({
+                code: "0001",
+                message: err
+            }).end();
+            return;
+        }
+        res.send({
+            code: "0000",
+            message: "success"
+        }).end();
+    })
+})
+// 修改公共数据
+router.post('/modifyCommon', (req, res) => {
+    let userName = req.body.userName;
+    let nodeId = req.body.nodeId;
+    let handLine = req.body.handLine;
+    selectData.userInfo(userName, 'admin').then((admin) => {
+        if (admin == 1 || admin == 2){
+            db.DBConnection.query(`update menu set handLine='${handLine}' where nodeId='${nodeId}'`, (err, data) => {
+                try {
+                    if (err) throw err;
+                } catch(err){
+                    res.send({
+                        code: "0001",
+                        message: err
+                    }).end();
+                    return;
+                }
+                res.send({
+                    code: "0000",
+                    message: "success"
+                }).end();
+            })
+        } else {
+            res.send({
+                code: "0005",
+                message: "对不起，您的权限不够无法删除！"
+            }).end();
+        }
+    }).catch((err)=>{
+        res.send({
+            code: "0001",
+            message: err
+        }).end();
+    })
+})
+
 module.exports = router;

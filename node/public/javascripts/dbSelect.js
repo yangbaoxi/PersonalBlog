@@ -12,4 +12,17 @@ const userInfo = (userName, name) => {
     })
 }
 
+// 查询文章列表的数据
+const articleInfo = (nodeId) => {
+    return new Promise((resolve, reject) => {
+        db.DBConnection.query(`select * from article where nodeId='${nodeId}'`, (err, data) => {
+            if (err){
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        })
+    })
+} 
 module.exports.userInfo = userInfo;
+module.exports.articleInfo = articleInfo;
