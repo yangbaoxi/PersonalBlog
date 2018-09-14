@@ -7,7 +7,7 @@ var selectData = require('../public/javascripts/dbSelect');
 router.get('/private/:userName', (req, res) => {
     let userName = req.params.userName;
     selectData.userInfo(userName, 'id').then((ownerId) => {
-        db.DBConnection.query(`select nodeId,handLine from menu where ownerId='${ownerId}'`,(err, data) => {
+        db.DBConnection.query(`select nodeId,hendLine from menu where ownerId='${ownerId}'`,(err, data) => {
             try {
                 if (err) throw err; 
             } catch (err){
@@ -53,7 +53,7 @@ router.get('/private/:userName', (req, res) => {
 })
 //  请求公共数据
 router.get('/common', (req, res) => {
-    db.DBConnection.query(`select nodeId,handLine from menu where ownerId='0'`,(err, data) => {
+    db.DBConnection.query(`select nodeId,hendLine from menu where ownerId='0'`,(err, data) => {
         try {
             if (err) throw err; 
         } catch (err){
@@ -76,10 +76,10 @@ router.get('/common', (req, res) => {
 // 添加私有数据
 router.post('/setPrivate', (req, res) => {
     let userName = req.body.userName;
-    let handLine = req.body.handLine;
+    let hendLine = req.body.hendLine;
     selectData.userInfo(userName,'id').then((ownerId) => {
         console.log('用户id',ownerId);
-        db.DBConnection.query(`insert into menu(handLine,ownerId) values('${handLine}','${ownerId}')`, (err, data) => {
+        db.DBConnection.query(`insert into menu(hendLine,ownerId) values('${hendLine}','${ownerId}')`, (err, data) => {
             try {
                 if (err) throw err; 
             } catch (err) {
@@ -104,13 +104,13 @@ router.post('/setPrivate', (req, res) => {
 // 添加公共数据
 router.post('/setCommon', (req, res) => {
     let userName = req.body.userName;
-    let handLine = req.body.handLine;
+    let hendLine = req.body.hendLine;
     selectData.userInfo(userName,'admin').then((admin) => {
         console.log('用户权限',admin);
         
         if (admin == 1 || admin == 2){
             let ownerId = 0;
-            db.DBConnection.query(`insert into menu(handLine,ownerId) values('${handLine}','${ownerId}')`, (err, data) => {
+            db.DBConnection.query(`insert into menu(hendLine,ownerId) values('${hendLine}','${ownerId}')`, (err, data) => {
                 try {
                     if (err) throw err; 
                 } catch (err) {
@@ -207,8 +207,8 @@ router.post('/deleteCommon', (req, res) => {
 // 修改私有数据
 router.post('/modifyPrivate', (req, res) => {
     let nodeId = req.body.nodeId;
-    let handLine = req.body.handLine;
-    db.DBConnection.query(`update menu set handLine='${handLine}' where nodeId='${nodeId}'`, (err, data) => {
+    let hendLine = req.body.hendLine;
+    db.DBConnection.query(`update menu set hendLine='${hendLine}' where nodeId='${nodeId}'`, (err, data) => {
         try {
             if (err) throw err;
         } catch(err){
@@ -228,10 +228,10 @@ router.post('/modifyPrivate', (req, res) => {
 router.post('/modifyCommon', (req, res) => {
     let userName = req.body.userName;
     let nodeId = req.body.nodeId;
-    let handLine = req.body.handLine;
+    let hendLine = req.body.hendLine;
     selectData.userInfo(userName, 'admin').then((admin) => {
         if (admin == 1 || admin == 2){
-            db.DBConnection.query(`update menu set handLine='${handLine}' where nodeId='${nodeId}'`, (err, data) => {
+            db.DBConnection.query(`update menu set hendLine='${hendLine}' where nodeId='${nodeId}'`, (err, data) => {
                 try {
                     if (err) throw err;
                 } catch(err){

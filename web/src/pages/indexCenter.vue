@@ -18,14 +18,14 @@
                             <i class="el-icon-location"></i>
                             <span>公共资料</span>
                         </template>
-                        <el-menu-item v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">{{ item.handLine }}</el-menu-item>
+                        <el-menu-item v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">{{ item.hendLine }}</el-menu-item>
                     </el-submenu>
                     <el-submenu index="$1">
                         <template slot="title">
                             <i class="el-icon-location"></i>
                             <span>私有资料</span>
                         </template>
-                        <el-menu-item v-for="(item, index) in menuPrivateData" :key="index" :index="item.menuIndex">{{ item.handLine }}</el-menu-item>
+                        <el-menu-item v-for="(item, index) in menuPrivateData" :key="index" :index="item.menuIndex">{{ item.hendLine }}</el-menu-item>
                     </el-submenu>
                 </el-menu>
             </div>
