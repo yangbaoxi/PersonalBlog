@@ -4,22 +4,46 @@
             <div class="slideshow-image" v-for="item in slideshowImages" :style="'background-image:url(' + item.src + ')'"></div>
         </div>
         <!-- 登录 -->
-        <div class="login">
-            <div class="title">
-                <h3>用户登录</h3>
-            </div>
-            <div class="input">
-                <el-input v-model="reqUser.userName" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="用户名"></el-input>
-                <el-input v-model="reqUser.password" type="password" prefix-icon="el-icon-ump-pwd" placeholder="密码"></el-input>
-                <div class="createCode">
-                    <el-input v-model="userCode" prefix-icon="el-icon-ump-key" placeholder="验证码"></el-input>
-                    <span class="code" @click="switchCode()">
-                        {{ loginCode }}
-                    </span>
+        <transition-group name='tran' mode='out-in'>
+            <div class="login" key="1" v-show="loginShow">
+                <div class="title">
+                    <h3>用户登录</h3>
                 </div>
-                <el-button round @click="signIn()">登录</el-button>
+                <div class="input">
+                    <el-input v-model="reqUser.userName" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="用户名"></el-input>
+                    <el-input v-model="reqUser.password" type="password" prefix-icon="el-icon-ump-pwd" placeholder="密码"></el-input>
+                    <div class="createCode">
+                        <el-input v-model="userCode" prefix-icon="el-icon-ump-key" placeholder="验证码" @keyup.enter.native="signIn()"></el-input>
+                        <span class="code" @click="switchCode()">
+                            {{ loginCode }}
+                        </span>
+                    </div>
+                    <div class="sign-in">   
+                        <el-button round @click="signIn()">登录</el-button>
+                    </div>
+                    <div class="text clearfix">
+                        <!-- <el-button type="text" class="text-pass" @click="forgetPass()">忘记密码?</el-button> -->
+                        <!-- <el-button type="text" class="text-reg">立即注册</el-button> -->
+                    </div>
+                </div>
             </div>
-        </div>
+            <div class="login forget" v-show="!loginShow" key="2">
+                <div class="title">
+                    <h3>修改密码</h3>
+                </div>
+                <div class="input">
+                    <el-input v-model="reqUser.userName" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="用户名"></el-input>
+                    <el-input v-model="reqUser.password" type="password" prefix-icon="el-icon-ump-pwd" placeholder="密码"></el-input>
+                    <el-input v-model="confirmPass" type="password" prefix-icon="el-icon-ump-pwd" placeholder="确认密码"></el-input>
+                    <div class="sign-in">   
+                        <el-button round @click="modifyPass()">确认修改</el-button>
+                    </div>
+                    <div class="text clearfix">
+                        <el-button type="text" class="text-pass" @click="login()">立即登录</el-button>
+                    </div>
+                </div>
+            </div>
+        </transition-group>
     </div>
 </template>
 
@@ -27,7 +51,7 @@
 export default {
     data () {
         return {
-            storage: null,
+            loginShow: true,
             winHeight: "",              // 浏览器main高度
             slideshowImages: [          // 登录页
                 {
@@ -45,10 +69,11 @@ export default {
             ],
             loginCode: "",
             userCode: "",
-            reqUser: {
+            reqUser: {      // 帐号密码
                 userName: "",
                 password: ""
-            }
+            },
+            confirmPass: ""     // 确认密码
         }
     },
     methods: {
@@ -67,6 +92,7 @@ export default {
         switchCode(){
             this.createCode();
         },
+        // 登录
         signIn(){
             let userCode = this.userCode.toUpperCase();
             let loginCode = this.loginCode.toUpperCase();
@@ -91,24 +117,28 @@ export default {
                     this.createCode();
                 }
             } else {
-                this.$api.signIn(this.reqUser)
-                .then((res) => {
-                    this.$Fn.errorCode(res.code,res.message)
-                    .then(() => {
-                        console.log(res);
-                        this.storage.set('userId',res.userId);
-                        this.$router.push('/indexCenter');
+                this.$api.signIn(this.reqUser).then((res) => {
+                    this.$Fn.errorCode(res.code,res.message).then(() => {
+                        this.$router.push('/');
                     })
-                })
-                .catch((err) => {
+                }).catch((err) => {
                     console.log(err);
                 })
             }
+        },
+        modifyPass(){
+
+        },
+        // 切换注册界面
+        forgetPass(){
+            this.loginShow = false;
+        },
+        // 切换登录界面
+        login(){
+            this.loginShow = true;
         }
     },
     mounted () {
-        // Localstorage
-        this.storage = new this.$Fn.Localstorage();
         this.winHeight = document.body.clientHeight;
         window.onresize = () => {
             this.winHeight = document.body.clientHeight;
@@ -390,6 +420,26 @@ export default {
         right: 5px;
         color: #fff;
     }
+    .login-account .text{
+        margin-top: 10px;
+    }
+    .login-account .text .text-pass{
+        float: left;
+    }
+    .login-account .text .text-reg{
+        float: right;
+    }
+    .tran-enter-active,.tran-leave-active{
+        transition: all .5s;
+    }
+    .tran-enter{
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    .tran-leave-to{
+        opacity: 0;
+        transform: translateX(-10px);
+    }
 </style>
 <style>
     .login-account .input .el-input{
@@ -403,7 +453,7 @@ export default {
     .login-account .input .el-input__inner:hover{
         border: none;
     }
-    .login-account .input .el-button{
+    .login-account .input .sign-in .el-button{
         background: transparent;
         width: 100%;
         margin-top: 20px;
@@ -413,7 +463,7 @@ export default {
         transition-duration: .2s;
         font-size: 14px;
     }
-    .login-account .input .el-button:hover{
+    .login-account .input .sign-in .el-button:hover{
         color: #fff;
         background: #4fa1d9;
         cursor: pointer;

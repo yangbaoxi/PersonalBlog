@@ -1,7 +1,7 @@
 <template>
     <div class="index-center">
         <!-- 导航部分 -->
-        <div class="nav"></div>
+        <home-nav></home-nav>
         <!-- 主体内容 -->
         <div class="main clearfix" :style="{height: winHeight + 'px'}">
             <div class="menu fl">
@@ -15,26 +15,38 @@
                     active-text-color="#1b62ab">
                     <el-submenu index="$0">
                         <template slot="title">
-                            <i class="el-icon-location"></i>
+                            <i class="el-icon-ump-yun"></i>
                             <span>公共资料</span>
                         </template>
-                        <el-menu-item v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">{{ item.hendLine }}</el-menu-item>
+                        <el-submenu v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">
+                            <template slot="title">{{ item.hendLine }}</template>
+                            <el-menu-item v-for="(article,index) in item.children" :key="index" :index="'$0' + String(article.docId)" @click="getArticle(article)">{{ article.headLine }}</el-menu-item>
+                        </el-submenu>
                     </el-submenu>
                     <el-submenu index="$1">
                         <template slot="title">
-                            <i class="el-icon-location"></i>
+                            <i class="el-icon-ump-siyouyun"></i>
                             <span>私有资料</span>
                         </template>
-                        <el-menu-item v-for="(item, index) in menuPrivateData" :key="index" :index="item.menuIndex">{{ item.hendLine }}</el-menu-item>
+                        <el-submenu v-for="(item, index) in menuPrivateData" :key="index" :index="item.menuIndex">
+                            <template slot="title">{{ item.hendLine }}</template>
+                            <el-menu-item v-for="(article,index) in item.children" :key="index" :index="'$1' + String(article.docId)" @click="getArticle(article)">{{ article.headLine }}</el-menu-item>
+                        </el-submenu>
                     </el-submenu>
                 </el-menu>
             </div>
             <div class="content fl clearfix">
                 <div class="text fl">
-
+                    <div class="article" v-for="(item,index) in articleData">
+                        <h2>{{ item.hendLine }}</h2>
+                        <p>{{ item.case_text }}</p>
+                        <p>{{ item.annotation }}</p>
+                    </div>
                 </div>
                 <div class="code fl">
-
+                    <pre v-for="(item,index) in articleData">
+                        {{ item.case_code }}
+                    </pre>
                 </div>
             </div>
         </div>
@@ -42,13 +54,18 @@
 </template>
 
 <script>
+import homeNav from "@/components/nav/homeNav"
 export default {
+    components: {
+        homeNav
+    },
     data () {
         return {
-            storage: null,
-            winHeight: "",
-            menuCommonData: [],
-            menuPrivateData: []
+            winHeight: "",              // 页面高度
+            menuCommonData: [],         // 公共菜单数据
+            menuPrivateData: [],        // 私有菜单数据
+            articleData: []             // 文章数据
+
         }
     },
     methods: {
@@ -62,8 +79,8 @@ export default {
         getMenuCommon(){
             this.$api.getMenuCommon().then((res) => {
                 this.$Fn.errorCode(res.code, res.message).then(() => {
-                    console.log('私有数据,',res);
-                    this.menuCommonData = res.data;
+                    console.log('公共,',res);
+                    this.menuCommonData = res.data.data;
                     this.menuCommonData.forEach(item => {
                         item.menuIndex = item.nodeId.toString();
                     })
@@ -72,39 +89,43 @@ export default {
         },
         // 获取私有数据
         getMenuPrivate(){
-            let userId = this.storage.get('userId');
-            this.$api.getMenuPrivate(userId).then((res) => {
-                this.$Fn.errorCode(res.code, res.message).then(() => {
-                    console.log(res.data);
-                    this.menuPrivateData = res.data;
-                    this.menuPrivateData.forEach(item => {
-                        item.menuIndex = item.nodeId.toString();
-                    });
+            this.$Fn.getCookie('userName').then((userName) => {
+                this.$api.getMenuPrivate(userName).then((res) => {
+                    this.$Fn.errorCode(res.code, res.message).then(() => {
+                        this.menuPrivateData = res.data.data;
+                        this.menuPrivateData.forEach(item => {
+                            item.menuIndex = item.nodeId.toString();
+                        });
+                    })
+                    console.log('私有数据',res);
                 })
-            }).catch((err) => {
-                console.log(err);
             })
+        },
+        // 公共数据获取文章
+        getArticle(article){
+            this.$api.getArticle(article.docId).then((res) => {
+                this.$Fn.errorCode(res.code, res.message).then(() => {
+                    this.articleData = res.data.data;
+                })
+                console.log('文章',res);
+            })
+            console.log(article);
         }
     },
     mounted () {
-        this.storage = new this.$Fn.Localstorage();
         this.winHeight = document.body.clientHeight;
         window.onresize = () => {
             this.winHeight = document.body.clientHeight;
         }
         // 获取菜单数据
-        // this.getMenuCommon();
+        this.getMenuCommon();
         this.getMenuPrivate();
     }
 }
 </script>
 
 <style scoped>
-    .index-center .nav{
-        height: 60px;
-        background: #1b62ab;
-        line-height: 60px;
-    }
+    /* 菜单样式 */
     .index-center .menu{
         width: 220px;
         height: 100%;
@@ -130,11 +151,30 @@ export default {
     .index-center .content .text{
         width: 50%;
         height: 100%;
+        padding: 20px;
     }
     .index-center .content .code{
         width: 50%;
         height: 100%;
-        background: #1b62ab;
+        background: #24292e;
+        padding: 20px;
+    }
+    .index-center .content .code pre{
+        font-family: monospace, sans-serif;
+        color: #fff;
+        font-size: 15px;
+    }
+    .index-center .content .text .article h2{
+        font-size: 20px;
+        color: #333333;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .index-center .content .text .article p{
+        font-size: 15px;
+        color: #333333;
+        line-height: 30px;
+        text-indent: 2em;
     }
 </style>
 <style>

@@ -38,8 +38,8 @@ router.post('/signIn', function(req, res) {
                         }).end();
                         return; 
                     }
-                    res.cookie('token',dateTime,{maxAge: 900000});
-                    res.cookie('userId',userName,{maxAge: 900000});
+                    res.cookie('token',dateTime,{maxAge: 1*24*60*60*1000});
+                    res.cookie('userName',userName,{maxAge: 1*24*60*60*1000});
                     res.send({
                         code: "0000",
                         message: "success",
@@ -98,7 +98,7 @@ router.post('/register',(req, res)=>{
     
 })
 
-router.post('/modify',(req, res) =>{
+router.post('/modifyUser',(req, res) =>{
     let userName = req.body.userName;
     db.DBConnection.query(`select id,userName from user where userName='${userName}'`, (err, data)=>{
         try {

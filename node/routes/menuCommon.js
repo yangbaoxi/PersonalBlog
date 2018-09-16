@@ -63,14 +63,31 @@ router.get('/common', (req, res) => {
             }).end();
             return;
         }
-        res.send({
-            code: "0000",
-            message: "success",
-            data: {
-                data: data
+        async.map(data,(item, callback) => {
+            item.children = [];
+            db.DBConnection.query(`select * from article where nodeId='${item.nodeId}'`,(err, data)=>{
+                if (err) throw err;
+                item.children = data;
+                callback(null, item);
+            })
+        },(err, results) => {
+            try {
+                if (err) throw err; 
+            } catch (err){
+                res.send({
+                    code: "0001",
+                    message: err
+                }).end();
+                return;
             }
-        }).end();
-        console.log('数据是：',data);
+            res.send({
+                code: "0000",
+                message: "success",
+                data: {
+                    data: results
+                }
+            }).end();
+        })
     })
 })
 // 添加私有数据

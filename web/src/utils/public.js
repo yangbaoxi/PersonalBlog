@@ -47,8 +47,19 @@ const Localstorage = () => {
         clear: clear
     }
 }
-
+// 获取 cookie
+export const getCookie = (name) => {
+    return new Promise((resolve, reject) => {
+        let arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
+        if (arr != null) {
+            resolve(unescape(arr[2]));
+        } else {
+            resolve(null);
+        }
+    })
+}
 export default{
     errorCode,
-    Localstorage
+    Localstorage,
+    getCookie
 }
