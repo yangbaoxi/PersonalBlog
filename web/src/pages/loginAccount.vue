@@ -5,7 +5,7 @@
         </div>
         <!-- 登录 -->
         <transition-group name='tran' mode='out-in'>
-            <div class="login" key="1" v-show="loginShow">
+            <div class="login" key="1" v-show="loginShow == 1">
                 <div class="title">
                     <h3>用户登录</h3>
                 </div>
@@ -23,11 +23,11 @@
                     </div>
                     <div class="text clearfix">
                         <!-- <el-button type="text" class="text-pass" @click="forgetPass()">忘记密码?</el-button> -->
-                        <!-- <el-button type="text" class="text-reg">立即注册</el-button> -->
+                        <el-button type="text" class="text-reg" @click="regUserIn()">立即注册</el-button>
                     </div>
                 </div>
             </div>
-            <div class="login forget" v-show="!loginShow" key="2">
+            <!-- <div class="login forget" v-show="!loginShow" key="2">
                 <div class="title">
                     <h3>修改密码</h3>
                 </div>
@@ -42,6 +42,23 @@
                         <el-button type="text" class="text-pass" @click="login()">立即登录</el-button>
                     </div>
                 </div>
+            </div> -->
+            <div class="login forget" v-show="loginShow == 2" key="2">
+                <div class="title">
+                    <h3>注册用户</h3>
+                </div>
+                <div class="input">
+                    <el-input v-model="regUser.userName" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="用户名"></el-input>
+                    <el-input v-model="regUser.realName" prefix-icon="el-icon-ump-xingmingyonghumingnicheng" placeholder="昵称"></el-input>
+                    <el-input v-model="regUser.password" type="password" prefix-icon="el-icon-ump-pwd" placeholder="密码"></el-input>
+                    <el-input v-model="confirmPass" type="password" prefix-icon="el-icon-ump-pwd" @keyup.enter.native="register()" placeholder="确认密码"></el-input>
+                    <div class="sign-in">
+                        <el-button round @click="register()">立即注册</el-button>
+                    </div>
+                    <div class="text clearfix">
+                        <el-button type="text" class="text-pass" @click="login()">立即登录</el-button>
+                    </div>
+                </div>
             </div>
         </transition-group>
     </div>
@@ -51,7 +68,7 @@
 export default {
     data () {
         return {
-            loginShow: true,
+            loginShow: 1,
             winHeight: "",              // 浏览器main高度
             slideshowImages: [          // 登录页
                 {
@@ -73,10 +90,16 @@ export default {
                 userName: "",
                 password: ""
             },
+            regUser: {      // 注册信息
+                userName: "",
+                password: "",
+                realName: ""
+            },
             confirmPass: ""     // 确认密码
         }
     },
     methods: {
+        // 效验码函数
         createCode(){
             this.loginCode = "";
             let codeLength = 4;
@@ -89,8 +112,13 @@ export default {
                 // console.log(this.loginCode);
             }
         },
+        // 切换效验码
         switchCode(){
             this.createCode();
+        },
+        // 切换登录界面
+        login(){
+            this.loginShow = 1;
         },
         // 登录
         signIn(){
@@ -126,17 +154,62 @@ export default {
                 })
             }
         },
+        // 切换注册页面
+        regUserIn(){
+            this.loginShow = 2;
+        },
+        // 立即注册
+        register(){
+            if (this.regUser.userName.length == 0 || this.regUser.realName.length == 0 || this.regUser.password.length == 0){
+                if (this.regUser.userName.length == 0){
+                    this.$message({
+                        message: '请输入用户名',
+                        type: 'warning'
+                    });
+                } else if (this.regUser.realName.length == 0){
+                    this.$message({
+                        message: '请输入昵称',
+                        type: 'warning'
+                    });
+                } else if (this.regUser.password.length == 0){
+                    this.$message({
+                        message: '请输入密码',
+                        type: 'warning'
+                    });
+                }
+            } else {
+                if (this.regUser.password == this.confirmPass){
+                    this.$api.register(this.regUser).then((res) => {
+                        this.$Fn.errorCode(res.code,res.message).then((res) => {
+                            this.reqUser.userName = this.regUser.userName;
+                            this.reqUser.password = this.regUser.password;
+                            this.$api.signIn(this.reqUser).then((res) => {
+                                this.$Fn.errorCode(res.code,res.message).then(() => {
+                                    this.$router.push('/');
+                                })
+                            }).catch((err) => {
+                                console.log(err);
+                            })
+                        })
+                    }).catch((err) => {
+                        console.log(err);
+                    })
+                } else {
+                    this.$message({
+                        message: '俩次密码不一致,请重新输入',
+                        type: 'warning'
+                    });
+                }
+            }
+        },
         modifyPass(){
 
         },
         // 切换注册界面
         forgetPass(){
             this.loginShow = false;
-        },
-        // 切换登录界面
-        login(){
-            this.loginShow = true;
         }
+
     },
     mounted () {
         this.winHeight = document.body.clientHeight;
@@ -229,7 +302,6 @@ export default {
             opacity: 1;
         }
     }
-
     @keyframes kenburns-1 {
         0% {
             opacity: 1;

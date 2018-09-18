@@ -61,7 +61,7 @@ router.post('/register',(req, res)=>{
     let userName = req.body.userName;
     let password = crypto.createHmac('sha1','personalBlog!@#').update(req.body.password).digest('hex');
     let realName = req.body.realName;
-    let admin = req.body.admin;
+    let admin = 0;      // 注册默认普通用户
     db.DBConnection.query(`select userName from user where userName='${userName}'`, (err, data)=>{
         try {
             if (err) throw err;
@@ -97,7 +97,6 @@ router.post('/register',(req, res)=>{
     })
     
 })
-
 router.post('/modifyUser',(req, res) =>{
     let userName = req.body.userName;
     db.DBConnection.query(`select id,userName from user where userName='${userName}'`, (err, data)=>{
@@ -133,6 +132,34 @@ router.post('/modifyUser',(req, res) =>{
                     code: "0000",
                     message: "success"
                 }).end();
+            })
+        }
+    })
+})
+router.post('/userInfo', (req, res) => {
+    let userName = req.body.userName;
+    db.DBConnection.query(`select realName,admin from user where userName='${userName}'`, (err, data) => {
+        try {
+            if (err) throw err; 
+        } catch (err){
+            res.send({
+                code: "0001",
+                message: err
+            }).end();
+            return;
+        }
+        if (data.length == 0){
+            res.send({
+                code: "0002",
+                message: "用户名不存在"
+            }).end();
+        } else {
+            res.send({
+                code: "0000",
+                message: "success",
+                data: {
+                    data: data[0]
+                }
             })
         }
     })

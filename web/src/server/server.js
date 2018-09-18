@@ -16,6 +16,10 @@ const register = data => {
 const modifyUser = data => {
     return req.post('/users/modifyUser', data);
 }
+// 1.1.4 用户信息查询
+export const userInfo = data => {
+    return req.post('/users/userInfo', data);
+}
 //  2.1.1 获取共有数据
 const getMenuCommon = data => {
     return req.get('/menu/common');
@@ -24,6 +28,15 @@ const getMenuCommon = data => {
 const getMenuPrivate = data => {
     return req.get('/menu/private/' + data)
 }
+// 2.1.3 添加私有数据
+const setMenuPrivate = data => {
+    return req.post('/menu/setPrivate', data);
+}
+// 2.1.4 添加共有数据
+const setMenuCommon = data => {
+    return req.post('/menu/setCommon', data);
+}
+
 // 3.1.1 获取文章数据
 const getArticle = data => {
     return req.get('/details/article/' + data);
@@ -41,8 +54,11 @@ export default{
     signIn,
     register,
     modifyUser,
+    userInfo,
     getMenuPrivate,
     getMenuCommon,
+    setMenuCommon,
+    setMenuPrivate,
     getArticle,
     ceshiPost,
     ceshiGet

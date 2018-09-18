@@ -17,21 +17,29 @@
                         <template slot="title">
                             <i class="el-icon-ump-yun"></i>
                             <span>公共资料</span>
+                            <i class="el-icon-plus add-menu" @click.stop.self="setCommon()" v-if="admin == 1 || admin == 2"></i>
                         </template>
                         <el-submenu v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">
                             <template slot="title">{{ item.hendLine }}</template>
                             <el-menu-item v-for="(article,index) in item.children" :key="index" :index="'$0' + String(article.docId)" @click="getArticle(article)">{{ article.headLine }}</el-menu-item>
                         </el-submenu>
+                        <span v-if="menuCommonInputShow">
+                            <el-input v-model.trim="setCommonFolder.hendLine" placeholder="新建文件夹" :autofocus="true" @blur="closeInput()" @keyup.enter.native="setCommonInput()"></el-input>
+                        </span>
                     </el-submenu>
                     <el-submenu index="$1">
                         <template slot="title">
                             <i class="el-icon-ump-siyouyun"></i>
                             <span>私有资料</span>
+                            <i class="el-icon-plus add-menu" @click.stop.self="setPrivate()"></i>
                         </template>
                         <el-submenu v-for="(item, index) in menuPrivateData" :key="index" :index="item.menuIndex">
                             <template slot="title">{{ item.hendLine }}</template>
                             <el-menu-item v-for="(article,index) in item.children" :key="index" :index="'$1' + String(article.docId)" @click="getArticle(article)">{{ article.headLine }}</el-menu-item>
                         </el-submenu>
+                        <span v-if="menuPrivateInputShow">
+                            <el-input v-model.trim="setPrivateFolder.hendLine" placeholder="新建文件夹" :autofocus="true" @blur="closeInput()" @keyup.enter.native="setPrivateInput()"></el-input>
+                        </span>
                     </el-submenu>
                 </el-menu>
             </div>
@@ -61,11 +69,21 @@ export default {
     },
     data () {
         return {
-            winHeight: "",              // 页面高度
-            menuCommonData: [],         // 公共菜单数据
-            menuPrivateData: [],        // 私有菜单数据
-            articleData: []             // 文章数据
-
+            winHeight: "",                  // 页面高度
+            userName: "",
+            menuCommonData: [],             // 公共菜单数据
+            menuPrivateData: [],            // 私有菜单数据
+            articleData: [],                // 文章数据
+            menuCommonInputShow: false,     // 公共菜单添加
+            menuPrivateInputShow: false,    // 私有菜单添加
+            setCommonFolder: {
+                userName: '',
+                hendLine: ''
+            },
+            setPrivateFolder: {
+                userName: '',
+                hendLine: ''
+            }
         }
     },
     methods: {
@@ -110,6 +128,47 @@ export default {
                 console.log('文章',res);
             })
             console.log(article);
+        },
+        // 添加菜单
+        setCommon(){
+            this.menuCommonInputShow = true;
+        },
+        // 添加私有数据
+        setPrivate(){
+            this.menuPrivateInputShow = true;
+        },
+        // input失去焦点
+        closeInput(){
+            this.menuCommonInputShow = false;
+            this.menuPrivateInputShow = false;
+        },
+        // 添加公共数据
+        setCommonInput(){
+            this.menuCommonInputShow = false;
+            if (this.setCommonFolder.hendLine.length != 0){
+                this.setCommonFolder.userName = this.userName;
+                this.$api.setMenuCommon(this.setCommonFolder).then((res) => {
+                    console.log(res);
+                    this.$Fn.errorCode(res.code, res.message).then(() => {
+                        this.getMenuCommon();
+                    })
+                })
+            }
+            this.setCommonFolder.hendLine = "";
+        },
+        // 添加私有数据
+        setPrivateInput(){
+            this.menuPrivateInputShow = false;
+            if (this.setPrivateFolder.hendLine.length != 0){
+                this.setPrivateFolder.userName = this.userName;
+                this.$api.setMenuPrivate(this.setPrivateFolder).then((res) => {
+                    this.$Fn.errorCode(res.code, res.message).then(() => {
+                        console.log(res);
+                        this.getMenuPrivate();
+                    })
+                })
+            }
+            this.setPrivateFolder.hendLine = "";
         }
     },
     mounted () {
@@ -117,9 +176,19 @@ export default {
         window.onresize = () => {
             this.winHeight = document.body.clientHeight;
         }
+        // 获取用户userName
+        this.$Fn.getCookie('userName').then((userName) => {
+            this.userName = userName;
+            console.log(this.userName);
+        })
         // 获取菜单数据
         this.getMenuCommon();
         this.getMenuPrivate();
+    },
+    computed: {
+        admin(){
+            return this.$store.getters.admin;
+        }
     }
 }
 </script>
@@ -176,6 +245,9 @@ export default {
         line-height: 30px;
         text-indent: 2em;
     }
+    .index-center  .add-menu {
+        margin-left: 20px;
+    }
 </style>
 <style>
     .index-center .el-menu{
@@ -192,6 +264,9 @@ export default {
     .index-center .el-menu-item:focus, .el-menu-item:hover{
         background: #1b62ab !important;
         color: #fff !important;
+    }
+    .index-center .el-submenu__title:hover i{
+        color: #ffffff;
     }
 </style>
 

@@ -137,6 +137,10 @@ router.post('/setCommon', (req, res) => {
                     }).end();
                     return;
                 }
+                res.send({
+                    code: "0000",
+                    message: "success"
+                }).end();
                 console.log(data);
             })
         } else {
