@@ -10,6 +10,12 @@ import indexCenter from "@/pages/indexCenter"
 import createArticle from "@/pages/createArticle"
 import userCentre from "@/pages/userCentre"
 import leavingMessage from "@/pages/leavingMessage"
+import adminCenter from "@/pages/adminCenter"
+import allCreate from "@/components/admin/allCreate"
+import dataReview from "@/components/admin/dataReview"
+import publishedMessage from "@/components/admin/publishedMessage"
+import userManagement from "@/components/admin/userManagement"
+
 import ceshi from "@/pages/ceshi"
 Vue.use(Router)
 
@@ -52,6 +58,36 @@ const router = new Router({
                 requiresAuth: true
             },
             component: leavingMessage
+        },
+        {
+            path: '/adminCenter',
+            name: 'adminCenter',
+            meta: {
+                requiresAuth: true
+            },
+            component: adminCenter,
+            children: [
+                {
+                    path: 'allCreate',
+                    name: "allCreate",
+                    component: allCreate
+                },
+                {
+                    path: "dataReview",
+                    name: 'dataReview',
+                    component: dataReview
+                },
+                {
+                    path: "publishedMessage",
+                    name: "publishedMessage",
+                    component: publishedMessage
+                },
+                {
+                    path: "userManagement",
+                    name: "userManagement",
+                    component: userManagement
+                }
+            ]
         },
         {
             path: "/ceshi",

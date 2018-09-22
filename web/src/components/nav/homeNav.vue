@@ -17,7 +17,7 @@
                 <router-link to="/userCentre">个人中心</router-link>
             </el-button>
             <el-button type="text" icon="el-icon-menu" v-if="admin == 1 || admin == 2">
-                <router-link to="/">管理员控制台</router-link>
+                <router-link to="/adminCenter">管理员控制台</router-link>
             </el-button>
         </div>
         <div class="user" @click="userPage()">

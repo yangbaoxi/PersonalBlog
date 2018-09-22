@@ -10,49 +10,20 @@
                             <el-input placeholder="请输入主标题" v-model="mainTitle" clearable></el-input>
                         </div>
                     </div>
-                    <div class="content clearfix" v-for="(item,index) in modules">
-                        <span class="label-text" v-if="index == 0">文章内容</span>
-                        <span class="label-text" v-else></span>
-                        <div class="input module">
-                            <div>
-                                <span class="module-text">模块标题（{{index + 1}}）</span>
-                                <el-input placeholder="请输入模块标题" v-model="item.moduleTitle" clearable></el-input>
-                            </div>
-                            <div>
-                                <span class="module-text">模块详情（{{index + 1}}）</span>
-                                <el-input type="textarea" :rows="4" placeholder="请输入模块详情" resize="none" v-model="item.moduleDetails"></el-input>
-                            </div>
-                            <div>
-                                <span class="module-text">模块代码（{{index + 1}}）</span>
-                                <!-- <article-edit :content="item.moduleCode"></article-edit> -->
-                                <quill-editor 
-                                    ref="edit"
-                                    v-model="item.moduleCode" 
-                                    :options="editorOption" 
-                                    @blur="onEditorBlur($event)" @focus="onEditorFocus($event)"
-                                    @change="onEditorChange($event)">
-                                </quill-editor>
-                            </div>
-                            <div>
-                                <span class="module-text">模块注解（{{index + 1}}）</span>
-                                <el-input type="textarea" :rows="4" placeholder="请输入模块注解" resize="none" v-model="item.moduleAnnotation"></el-input>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    <div class="add-module clearfix">
-                        <span class="label-text"></span>
-                        <el-button class="input" @click="setModule">添加模块</el-button>
-                    </div>
-                </div>
+                    <!-- component编辑页面 -->
+                    <component :is="editView" :editContent="editContent"></component>
+                    <!-- <article-edit-all :editContent="editContent"></article-edit-all> -->
+                </div> 
+                <!-- 右侧预览 -->
                 <div class="preview" :style="{height: editHeight + 'px'}">
                     <div class="title">
                         <el-button type="text" icon="el-icon-ump-baocun">保存</el-button>
-                        <el-button type="text" icon="el-icon-ump-fanhui">返回</el-button>
+                        <el-button type="text" icon="el-icon-refresh">切换编辑模版</el-button>
+                        <el-button class="return" type="text" icon="el-icon-ump-fanhui">返回</el-button>
                     </div>
                     <div class="preview-content">
                         <h3>{{ mainTitle }}</h3>
-                        <div v-for="(item,index) in modules">
+                        <!-- <div v-for="(item,index) in modules">
                             <h4>{{ item.moduleTitle }}</h4>
                             <div class="details">{{ item.moduleDetails }}</div>
                             <div class="ql-container ql-snow">
@@ -61,7 +32,7 @@
                                 </div>
                             </div>
                             <div class="details">{{ item.moduleAnnotation }}</div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -71,68 +42,46 @@
 
 <script>
 import homeNav from "@/components/nav/homeNav"
+import articleEditAll from '@/components/edit/articleEditAll';
+import articleEdit from '@/components/edit/articleEdit';
+
 import hljs from 'highlight.js'
 export default {
     components: {
-        homeNav
+        homeNav,
+        articleEditAll,
+        articleEdit
     },
     data () {
         return {
             winHeight: "",      // 浏览器的高度
             editHeight: "",     // 编辑页面的高度
             mainTitle: "",      // 主标题
-            modules: [
-                {
-                    moduleTitle: "",
-                    moduleDetails: "",
-                    moduleCode: "",
-                    moduleAnnotation: ""
-                }
-            ],
-            editorOption: {
-                placeholder: '请输入模块代码',
-                modules: {
-                    toolbar: [
-                        ['code-block']
-                        //['bold', 'italic', 'underline', 'strike'],
-                        // ['blockquote', 'code-block']
-                        // [{ 'header': 1 }, { 'header': 2 }],
-                        // [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        // [{ 'script': 'sub' }, { 'script': 'super' }],
-                        // [{ 'indent': '-1' }, { 'indent': '+1' }],
-                        // [{ 'direction': 'rtl' }],
-                        // [{ 'size': ['small', false, 'large', 'huge'] }],
-                        // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                        // [{ 'font': [] }],
-                        // [{ 'color': [] }, { 'background': [] }],
-                        // [{ 'align': [] }],
-                        // ['clean'],
-                        // ['link', 'image', 'video']
-                    ],
-                    syntax: {
-                        highlight: text => hljs.highlightAuto(text).value
+            editView: articleEdit,       // 编辑视图
+            editContent: {
+                moduleContent: "",  // 第一种编辑页面的 主题内容
+                module: [          // 第二种编辑页面的 主题内容
+                    {
+                        moduleTitle: "",
+                        moduleDetails: "",
+                        moduleCode: "",
+                        moduleAnnotation: ""
                     }
-                }
+                ]
             }
         }
     },
     methods: {
-        onEditorBlur(){ //失去焦点事件
-        },
-        onEditorFocus(){ //获得焦点事件
-        },
-        onEditorChange(){ //内容改变事件
-        },
         // 添加模块
-        setModule(){
-            let modelOpt = {
-                moduleTitle: "",
-                moduleDetails: "",
-                moduleCode: "",
-                moduleAnnotation: ""
-            }
-            this.modules.push(modelOpt);
-        }
+        // setModule(){
+        //     let modelOpt = {
+        //         moduleTitle: "",
+        //         moduleDetails: "",
+        //         moduleCode: "",
+        //         moduleAnnotation: ""
+        //     }
+        //     this.modules.push(modelOpt);
+        // }
     },
     mounted(){
         this.winHeight = document.body.clientHeight;
@@ -189,19 +138,6 @@ export default {
     .create-article .main .content {
         margin-top: 15px;
     }
-    .create-article .main .content .module{
-        padding: 10px;
-        border: 1px solid #d2d2d2;
-        margin-top: 15px;
-    }
-    .create-article .main .edit .module-text{
-        display: block;
-        font-size: 13px;
-        color: #1b62ab;
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-
     .create-article .add-module{
         text-align: center;
         margin-top: 20px;
@@ -221,6 +157,9 @@ export default {
     }
     .create-article .main .preview .title .el-button--text{
         color: #ffffff;
+    }
+    .create-article .main .preview .title .return{
+        float: right;
     }
     .create-article .main .preview .preview-content{
         margin-top: 15px;
