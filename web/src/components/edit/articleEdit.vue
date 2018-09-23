@@ -1,8 +1,8 @@
 <template>
     <div class="article-edit-module">
         <div class="main clearfix" v-for="(item,index) in editContent.module">
-            <!-- v-if="index == 0" -->
-            <span class="label-text">文章内容</span>
+            <span class="label-text" v-if="index == 0">文章内容</span>
+            <span class="label-text" v-else></span>
             <div class="input module">
                 <div>
                     <span class="module-text">模块标题（{{index + 1}}）</span>
@@ -28,6 +28,10 @@
                 </div>
             </div>
         </div>
+        <div class="add-module clearfix">
+            <span class="label-text"></span>
+            <el-button class="input" @click="setModule()">添加模块</el-button>
+        </div>
     </div>
 </template>
 
@@ -42,7 +46,7 @@ export default {
     data(){
         return {
             editorOption: {
-                placeholder: '请输入模块代码',
+                placeholder: '请输入模块代码...',
                 modules: {
                     toolbar: [
                         ['code-block']
@@ -58,8 +62,12 @@ export default {
         onEditorBlur(){ //失去焦点事件
         },
         onEditorFocus(){ //获得焦点事件
+            this.$message('注意编辑代码需要点击上面</>按钮！！！');
         },
         onEditorChange(){ //内容改变事件
+        },
+        setModule(){
+            this.$emit('setModule');
         }
     },
     mounted () {
@@ -90,5 +98,15 @@ export default {
         color: #1b62ab;
         margin-top: 10px;
         margin-bottom: 10px;
+    }
+    .article-edit-module .add-module{
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+<style>
+    .article-edit-module .quill-editor{
+        background: #ffffff;
     }
 </style>

@@ -3,24 +3,25 @@
         <home-nav></home-nav>
         <div class="clearfix">
             <div class="article fl">
-                <div>
-                    <h3>文章列表</h3>
-                </div>
-                <div class="menu">
-                    <span>JAVA</span>
-                </div>
-                <div class="menu">
-                    <span>JAVA</span>
-                </div>
-                <div class="menu">
-                    <span>JAVA</span>
-                </div>
-                <div class="menu">
-                    <span>JAVA</span>
-                </div>
-                <div class="menu">
-                    <span>JAVA</span>
-                </div>
+                <el-menu
+                    default-active="$0"
+                    class="el-menu-vertical-demo"
+                    @open="handleOpen"
+                    @close="handleClose"
+                    background-color="#f9f9f9"
+                    text-color="#333333"
+                    active-text-color="#1b62ab">
+                    <el-submenu index="$0">
+                        <template slot="title">
+                            <i class="el-icon-ump-yun"></i>
+                            <span>资料列表</span>
+                        </template>
+                        <el-submenu v-for="(item, index) in menuCommonData" :key="index" :index="item.menuIndex">
+                            <template slot="title">{{ item.headLine }}</template>
+                            <el-menu-item v-for="(article,index) in item.children" :key="index" :index="'$0' + String(article.docId)" @click="getArticle(article)">{{ article.headLine }}</el-menu-item>
+                        </el-submenu>
+                    </el-submenu>
+                </el-menu>
             </div>
             <div class="message fl">
                 <h3>留言区</h3>
@@ -70,8 +71,25 @@ export default {
     },
     data () {
         return {
-            textarea: ""
+            textarea: "",
+            menuCommonData: []
         }
+    },
+    methods: {
+        // 获取公共数据
+        getMenuCommon(){
+            this.$api.getMenuCommon().then((res) => {
+                this.$Fn.errorCode(res.code, res.message).then(() => {
+                    this.menuCommonData = res.data.data;
+                    // this.menuCommonData.forEach(item => {
+                    //     item.menuIndex = item.nodeId.toString();
+                    // })
+                })
+            })
+        }
+    },
+    mounted () {
+        this.getMenuCommon();
     }
 }
 </script>

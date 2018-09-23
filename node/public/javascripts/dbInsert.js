@@ -5,7 +5,7 @@ const async = require('async');
 const setModular = (list, docId) => {
     return new Promise((resolve, reject) => {
         async.map(list, (item, callback) => {
-            db.DBConnection.query(`insert into modular(docId,hendLine,case_text,case_code,annotation) values('${docId}','${item.hendLine}','${item.case_text}','${item.case_code}','${item.annotation}')`, (err, data) => {
+            db.DBConnection.query(`insert into modular(docId,headLine,case_text,case_code,annotation) values('${docId}','${item.headLine}','${item.case_text}','${item.case_code}','${item.annotation}')`, (err, data) => {
                 if (err) {
                     reject(err);
                 }

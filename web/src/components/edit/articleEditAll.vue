@@ -25,6 +25,7 @@ export default {
         return {
             // content: "",
             editorOption: {
+                placeholder: '请输入资料内容...',
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline', 'strike'],

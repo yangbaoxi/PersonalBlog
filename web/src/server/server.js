@@ -41,7 +41,10 @@ const setMenuCommon = data => {
 const getArticle = data => {
     return req.get('/details/article/' + data);
 }
-
+//  3.1.2 保存文章数据
+const setArticle = data => {
+    return req.post('/details/setArticle', data);
+}
 // 测试post接口
 const ceshiPost = (paths, data) => {
     return req.post(paths, data);
@@ -60,6 +63,7 @@ export default{
     setMenuCommon,
     setMenuPrivate,
     getArticle,
+    setArticle,
     ceshiPost,
     ceshiGet
 }

@@ -138,7 +138,7 @@ router.post('/modifyUser',(req, res) =>{
 })
 router.post('/userInfo', (req, res) => {
     let userName = req.body.userName;
-    db.DBConnection.query(`select realName,admin from user where userName='${userName}'`, (err, data) => {
+    db.DBConnection.query(`select realName,admin,sex,aSign from user where userName='${userName}'`, (err, data) => {
         try {
             if (err) throw err; 
         } catch (err){

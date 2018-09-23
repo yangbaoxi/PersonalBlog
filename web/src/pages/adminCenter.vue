@@ -53,6 +53,12 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .admin-center .menu{
+        width: 220px;
+        height: 100%;
+        background: #f9f9f9;
+        border-right: 1px solid #e0e0e0;
+        overflow-y: auto;
+    }
 </style>

@@ -30,8 +30,10 @@ router.get('/article/:docId', (req, res) => {
 // 新建文章模块
 router.post('/setArticle', (req, res) => {
     let article = req.body;
+    // console.log('所有参数',article);
+    // 查用户 ownerId 这行代码 没有用
     selectData.userInfo(article.userName, 'id').then((ownerId) => {
-        db.DBConnection.query(`insert into article(nodeId,headLine,ownerId) values('${article.nodeId}','${article.headLine}','${ownerId}')`, (err, data) => {
+        db.DBConnection.query(`insert into article(nodeId,headLine) values('${article.nodeId}','${article.headLine}')`, (err, data) => {
             try {
                 if (err) throw err;
             } catch(err) {

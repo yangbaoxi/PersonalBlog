@@ -11,103 +11,149 @@
                 </div>
                 <div class="info fl">
                     <h3>
-                        <span>第三人称</span>
+                        <span>{{ userInfo.realName }}</span>
                         <span class="edit fr">
-                            <el-button type="text" >编辑个人资料</el-button>
+                            <el-button type="text" @click="modifyUser()">编辑个人资料</el-button>
                         </span>
                     </h3>
                     <div class="info_boxOne">
                         <p>
                             <strong>签名</strong>
-                            <span>仅仅幻想的有点好而已</span>
+                            <span>{{ userInfo.aSign || "暂无" }}</span>
                         </p>
                         <p>
                             <strong>性别</strong>
-                            <span>男</span>
+                            <span>{{ userInfo.sex  || "暂无" }}</span>
                         </p>
                         <p>
-                            <strong>所在地</strong>
-                            <span>北京</span>
+                            <strong>密码</strong>
+                            <span>***********</span>
+                            <span class="icon" title="修改密码" @click="openModifyPass()"><i class="el-icon-setting"></i></span>
                         </p>
                     </div>
                 </div>
             </div>
             <div class="article fr">
                 <h3>拥有的文章</h3>
-                <div>
-                    <el-table :data="tableData" border style="width: 100%">
-                        <el-table-column prop="date" label="日期" width="150"></el-table-column>
-                        <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-                        <el-table-column prop="province" label="省份" width="120"></el-table-column>
-                        <el-table-column prop="city" label="市区" width="120"></el-table-column>
-                        <el-table-column prop="address" label="地址" width="300"></el-table-column>
-                        <el-table-column prop="zip" label="邮编" width="120"></el-table-column>
-                        <el-table-column fixed="right" label="操作" width="100">
-                            <template slot-scope="scope">
-                                <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-                                <el-button type="text" size="small">编辑</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+                <div class="content">
+                    <div class="nav">
+                        <el-button type="text">添加主资料库</el-button>
+                    </div>
+                    <el-tree :data="menuPrivateData" :props="menuPrivateProps" default-expand-all :expand-on-click-node="false" :check-strictly="true"  @check-change="handleCheckChange">
+                        <span class="custom-tree-node clearfix" slot-scope="{ node, data }">
+                            <span class="title_text">{{ node.label }}</span>
+                            <span class="optBtn">
+                                <el-button type="text" size="mini" @click="modifyArticle()">
+                                    修改
+                                </el-button>
+                                <el-button type="text" size="mini" @click="modifyArticle()">
+                                    查看
+                                </el-button>
+                                <el-button type="text" size="mini" @click="modifyArticle()">
+                                    删除
+                                </el-button>
+                            </span>
+                        </span>
+                    </el-tree>
                 </div>
             </div>
         </div>
+
+        <!-- 修改密码弹框 -->
+        <modify-pass-box :modifyPass='modifyPass' @confirmPass="confirmPass"></modify-pass-box>
     </div>
 </template>
 
 <script>
 import homeNav from "@/components/nav/homeNav"
+import modifyPassBox from "@/components/messageBox/modifyPassBox"
 export default {
     components: {
-        homeNav
+        homeNav,
+        modifyPassBox
     },
     data () {
         return {
-            tableData: [{
-                date: '2016-05-03',
-                name: '王小虎',
-                province: '上海',
-                city: '普陀区',
-                address: '上海市普陀区金沙江路 1518 弄',
-                zip: 200333
-            }, {
-                date: '2016-05-02',
-                name: '王小虎',
-                province: '上海',
-                city: '普陀区',
-                address: '上海市普陀区金沙江路 1518 弄',
-                zip: 200333
-            }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                province: '上海',
-                city: '普陀区',
-                address: '上海市普陀区金沙江路 1518 弄',
-                zip: 200333
-            }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                province: '上海',
-                city: '普陀区',
-                address: '上海市普陀区金沙江路 1518 弄',
-                zip: 200333
-            }]
+            userInfo: {},
+            modifyPass: {
+                modifyPassVisible: false,
+                oldPass: "",
+                newPass: "",
+                repeatPass: ""
+            },
+            menuPrivateData: [],
+            menuPrivateProps: {
+                label: "headLine"
+            }
         }
     },
     methods: {
         handleClick(row) {
             console.log(row);
+        },
+        // 获取用户信息
+        getUserInfo(){
+            this.$Fn.getCookie('userName').then((userName) => {
+                let reqData = {
+                    userName: userName
+                }
+                this.$api.userInfo(reqData).then((res) => {
+                    this.$Fn.errorCode(res.code, res.message).then(() => {
+                        console.log(res);
+                        this.userInfo = res.data.data;
+                    })
+                })
+            })
+        },
+        // 修改密码按钮开打弹框
+        openModifyPass(){
+            this.modifyPass.modifyPassVisible = true;
+        },
+        // 修改密码确认按钮
+        confirmPass(){
+
+        },
+        // 修改个人信息
+        modifyUser(){
+
+        },
+        // 获取私有数据
+        getMenuPrivate(){
+            this.$Fn.getCookie('userName').then((userName) => {
+                this.$api.getMenuPrivate(userName).then((res) => {
+                    this.$Fn.errorCode(res.code, res.message).then(() => {
+                        this.menuPrivateData = res.data.data;
+                        this.menuPrivateData.forEach(item => {
+                            item.children.forEach(children => {
+                                children.children = [];
+                            });
+                        });
+                        console.log('私有数据',this.menuPrivateData);
+                    })
+                })
+            })
+        },
+        handleCheckChange(data){
+            console.log(data);
+        },
+        // 修改主资料库或者其他
+        modifyArticle(){
+
         }
+    },
+    mounted () {
+        this.getUserInfo();  // 获取用户信息
+        this.getMenuPrivate();      // 获取用户所有文章列表
     }
 }
 </script>
 
 <style scoped>
     .user-centre{
-        background: #f9f8f8;
+        /* background: #f9f8f8; */
     }
     .user-centre .bg{
-        height: 200px;
+        height: 180px;
         overflow: hidden;
         background: #000000;
     }
@@ -119,10 +165,27 @@ export default {
         padding: 20px;
         background: #ffffff;
         float: left;
+        border-right: 1px solid #e5e5e5;
     }
     .user-centre .article{
         width: 40%;
         padding: 20px;
+    }
+    .user-centre .article h3{
+        border-left: 3px solid #1b62ab;
+        padding-left: 15px;
+    }
+    .user-centre .article .content{
+        margin-top: 15px;
+    }
+    .user-centre .article .content .optBtn{
+        float: right;
+    }
+    .user-centre .article .content .custom-tree-node{
+        width: 100%;
+    }
+    .user-centre .article .content .title_text{
+        font-size: 13px;
     }
     .user-centre .user .head-img{
         width: 150px;
@@ -158,9 +221,21 @@ export default {
     .user-centre .user .info_boxOne p span{
         color: #666666;
     }
+    .user-centre .user .info_boxOne p .icon{
+        margin-left: 10px;
+    }
 </style>
 <style>
     .user-centre .user .info  .el-button{
         padding-top: 0;
     }
+    .user-centre .article .content .el-tree-node__content{
+        height: 30px;
+    }
+    /* .user-centre .article .content .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+        background-color: #1b62ab;
+    }
+    .user-centre .article .content .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content span{
+        color:#fff;
+    } */
 </style>
