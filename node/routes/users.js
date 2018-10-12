@@ -3,6 +3,7 @@ var router = express.Router();
 var crypto = require('crypto');
 var db = require('../public/db/personaolDB');
 var common = require('../public/common/common');
+const selectData = require('../public/javascripts/dbSelect');
 /* GET users listing. */
 router.post('/signIn', function(req, res) {
     let userName = req.body.userName;
@@ -161,6 +162,40 @@ router.post('/userInfo', (req, res) => {
                     data: data[0]
                 }
             })
+        }
+    })
+})
+
+router.post('/modifyPass',(req, res) => {
+    let userName = req.body.userName;
+    let password = crypto.createHmac('sha1','personalBlog!@#').update(req.body.password).digest('hex');
+    let newPassword = crypto.createHmac('sha1','personalBlog!@#').update(req.body.newPassword).digest('hex');
+    selectData.userInfo(userName,'password').then((name) => {
+        console.log('密码是',name);
+        if (password == name){
+            selectData.userInfo(userName,'id').then((id)=>{
+                db.DBConnection.query(`update user set password='${newPassword}' where id='${id}'`, (err, data) => {
+                    try {
+                        if (err) throw err;
+                    } catch(err){
+                        res.send({
+                            code: "0001",
+                            message: err
+                        }).end();
+                        return;
+                    }
+
+                    res.send({
+                        code: "0000",
+                        message: "success"
+                    }).end();
+                })
+            })
+        } else {
+            res.send({
+                code: "0003",
+                message: "原密码不正确"
+            }).end();
         }
     })
 })

@@ -76,5 +76,69 @@ router.post('/setArticle', (req, res) => {
             message: err
         }).end();
     })
+});
+
+// 删除文章
+router.post('/deleteArticle', (req, res) => {
+    let docId = req.body.docId;
+    console.log('删除的数据是',docId);
+    db.DBConnection.query(`delete from article where docId='${docId}'`, (err, data) => {
+        try {
+            if (err) throw err;
+        } catch (err) {
+            res.send({ code: "0001", message: err }).end();
+            return;
+        }
+        db.DBConnection.query(`delete from modular where docId='${docId}'`, (err ,data) => {
+            try {
+                if (err) throw err;
+            } catch (err) {
+                res.send({ code: "0001", message: err }).end();
+                return;
+            }
+            res.send({
+                code: "0000",
+                message: "success"
+            }).end();
+        })
+    })
+});
+
+// 修改文章
+router.post('/modifyArticle', (req, res) => {
+    let article = req.body;
+    console.log('所有参数',article);
+})
+
+// 发布至共有资料
+router.post('/releaseArticle', (req, res) => {
+    console.log('发布',req.body);
+    let userName = req.body.userName;
+    let docId = req.body.docId;
+    let nodeId = req.body.nodeId;
+    selectData.userInfo(userName, 'admin').then((admin) => {
+        if (admin == 1 || admin == 2){
+            db.DBConnection.query(`select headLine from article where docId='${docId}'`, (err, data) => {
+                try { if(err) throw err ;} catch (err) {res.send({code: "0001", message: err })};
+                if (data.length == 0){
+                    res.send({ code: "0008", message: "没有查到此数据！！！"})
+                } else {
+                    let article = data[0];
+                    console.log('发布的资料',article);
+                    db.DBConnection.query(`update article set nodeId='${nodeId}' where docId='${docId}'`, (err, data) => {
+                        res.send({
+                            code: "0000",
+                            message: "发布成功！！！"
+                        }).end();
+                    })
+                }
+            })
+        } else {
+            res.send({ code: "0005",  message: '对不起，您没有发布资料的权限！！！' }).end();
+        }
+    }).catch((err)=>{
+        res.send({ code: "0001", message: err }).end();
+    })
+
 })
 module.exports = router;

@@ -3,13 +3,13 @@
         <el-dialog title="修改密码" :visible.sync="modifyPass.modifyPassVisible" width="25%">
             <div>
                 <div class="input">
-                    <el-input v-model="modifyPass.oldPass" prefix-icon="el-icon-ump-pwd" placeholder="请输入原密码"></el-input>
+                    <el-input type="password" v-model="modifyPass.oldPass" prefix-icon="el-icon-ump-pwd" placeholder="请输入原密码"></el-input>
                 </div>
                 <div class="input">
-                    <el-input v-model="modifyPass.newPass" prefix-icon="el-icon-ump-pwd" placeholder="请输入新密码"></el-input>
+                    <el-input type="password" v-model="modifyPass.newPass" prefix-icon="el-icon-ump-pwd" placeholder="请输入新密码"></el-input>
                 </div>
                 <div class="input">
-                    <el-input v-model="modifyPass.repeatPass" prefix-icon="el-icon-ump-pwd" placeholder="确认新密码"></el-input>
+                    <el-input type="password" v-model="modifyPass.repeatPass" prefix-icon="el-icon-ump-pwd" placeholder="确认新密码"></el-input>
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">

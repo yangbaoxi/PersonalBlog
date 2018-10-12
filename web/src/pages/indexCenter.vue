@@ -78,10 +78,6 @@ export default {
             setCommonFolder: {
                 userName: '',
                 headLine: ''
-            },
-            setPrivateFolder: {
-                userName: '',
-                headLine: ''
             }
         }
     },

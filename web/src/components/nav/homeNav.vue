@@ -10,9 +10,9 @@
             <el-button type="text" icon="el-icon-edit">
                 <router-link to="/createArticle">编辑资料</router-link>
             </el-button>
-            <el-button type="text" icon="el-icon-ump-weibiaoti-">
+            <!-- <el-button type="text" icon="el-icon-ump-weibiaoti-">
                 <router-link to="/leavingMessage">留言区</router-link>
-            </el-button>
+            </el-button> -->
             <el-button type="text" icon="el-icon-ump-xingmingyonghumingnicheng">
                 <router-link to="/userCentre">个人中心</router-link>
             </el-button>

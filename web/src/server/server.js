@@ -20,6 +20,10 @@ const modifyUser = data => {
 export const userInfo = data => {
     return req.post('/users/userInfo', data);
 }
+// 1.1.5 修改密码
+const modifyPass = data => {
+    return req.post('/users/modifyPass', data);
+}
 //  2.1.1 获取共有数据
 const getMenuCommon = data => {
     return req.get('/menu/common');
@@ -36,7 +40,14 @@ const setMenuPrivate = data => {
 const setMenuCommon = data => {
     return req.post('/menu/setCommon', data);
 }
-
+// 2.1.5 删除私有数据
+const deletePrivate = data => {
+    return req.post('/menu/deletePrivate', data);
+}
+// 2.1.7 修改私有数据
+const modifyPrivate = data => {
+    return req.post('/menu/modifyPrivate', data);
+}
 // 3.1.1 获取文章数据
 const getArticle = data => {
     return req.get('/details/article/' + data);
@@ -44,6 +55,15 @@ const getArticle = data => {
 //  3.1.2 保存文章数据
 const setArticle = data => {
     return req.post('/details/setArticle', data);
+}
+// 3.1.3 删除文章数据
+const deleteArticle = data => {
+    return req.post('/details/deleteArticle', data);
+}
+
+// 3.1.5 发布私有数据到共有数据
+const releaseArticle = data => {
+    return req.post('/details/releaseArticle', data);
 }
 // 测试post接口
 const ceshiPost = (paths, data) => {
@@ -58,12 +78,17 @@ export default{
     register,
     modifyUser,
     userInfo,
+    modifyPass,
     getMenuPrivate,
     getMenuCommon,
     setMenuCommon,
     setMenuPrivate,
+    modifyPrivate,
+    deletePrivate,
     getArticle,
     setArticle,
+    deleteArticle,
+    releaseArticle,
     ceshiPost,
     ceshiGet
 }

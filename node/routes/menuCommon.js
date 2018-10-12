@@ -94,6 +94,7 @@ router.get('/common', (req, res) => {
 router.post('/setPrivate', (req, res) => {
     let userName = req.body.userName;
     let headLine = req.body.headLine;
+    console.log(req.body);
     selectData.userInfo(userName,'id').then((ownerId) => {
         console.log('用户id',ownerId);
         db.DBConnection.query(`insert into menu(headLine,ownerId) values('${headLine}','${ownerId}')`, (err, data) => {
